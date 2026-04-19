@@ -10,72 +10,234 @@ from src.rag_pipeline import generate_answer
 st.set_page_config(
     page_title="SamvidhanGPT",
     page_icon="📜",
-    layout="wide"
+    layout="wide",
+    initial_sidebar_state="expanded"
 )
 
 # -----------------------------
-# PREMIUM CSS (CHATGPT STYLE)
+# 🔥 ULTRA-PREMIUM CSS STYLING
 # -----------------------------
 st.markdown("""
 <style>
-/* Global */
-body {
-    background-color: #0f172a;
-    color: #e5e7eb;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+/* 1. IMPORT PREMIUM FONTS */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+
+/* 2. GLOBAL OVERRIDES */
+html, body, [class*="css"] {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
+    background-color: #0B1120; /* Deep rich navy/black */
+    color: #F1F5F9;
 }
 
-/* Chat container */
+/* Hide default Streamlit header and footer for a clean app look */
+header[data-testid="stHeader"] { display: none; }
+footer[data-testid="stFooter"] { display: none; }
+
+/* 3. CUSTOM SCROLLBAR */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+::-webkit-scrollbar-track {
+    background: #0B1120;
+}
+::-webkit-scrollbar-thumb {
+    background: #1E293B;
+    border-radius: 10px;
+}
+::-webkit-scrollbar-thumb:hover {
+    background: #334155;
+}
+
+/* 4. MAIN CONTAINER SPACING */
 .block-container {
-    max-width: 900px;
+    max-width: 1000px !important;
     margin: auto;
-    padding-top: 2rem;
+    padding-top: 2rem !important;
+    padding-bottom: 5rem !important;
 }
 
-/* Chat bubbles */
-.chat-bubble-user {
-    background-color: #2563eb;
-    color: white;
-    padding: 12px 16px;
-    border-radius: 12px;
+/* 5. HEADER DESIGN (GLASSMORPHISM & GRADIENTS) */
+.custom-header {
+    text-align: center;
+    padding: 30px 20px;
+    margin-bottom: 40px;
+    background: rgba(30, 41, 59, 0.4);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 24px;
+    box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.5);
+    animation: fadeInDown 0.8s ease-out;
+}
+
+.custom-header h1 {
+    font-size: 42px;
+    font-weight: 800;
     margin-bottom: 10px;
-    max-width: 75%;
-    margin-left: auto;
-    font-size: 15px;
-    line-height: 1.6;
+    background: linear-gradient(135deg, #38BDF8 0%, #34D399 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    letter-spacing: -1px;
 }
 
-.chat-bubble-bot {
-    background-color: #1e293b;
-    color: #e2e8f0;
-    padding: 12px 16px;
-    border-radius: 12px;
-    margin-bottom: 10px;
-    max-width: 75%;
-    margin-right: auto;
-    font-size: 15px;
-    line-height: 1.6;
+.custom-header p {
+    color: #94A3B8;
+    font-size: 16px;
+    font-weight: 400;
+    margin: 0;
+    letter-spacing: 0.5px;
 }
 
-/* Typing text */
-.typing {
-    font-size: 15px;
+/* 6. CHAT ROW ANIMATIONS & LAYOUT */
+@keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(15px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.chat-row {
+    display: flex;
+    margin: 24px 0;
+    align-items: flex-end;
+    animation: fadeInUp 0.4s ease-out forwards;
+}
+
+.chat-row.user {
+    justify-content: flex-end;
+    flex-direction: row-reverse;
+}
+
+.chat-row.bot {
+    justify-content: flex-start;
+}
+
+/* 7. AVATAR DESIGN */
+.avatar {
+    margin: 0 16px;
+    font-size: 22px;
+    height: 44px;
+    width: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    flex-shrink: 0;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+    transition: transform 0.2s ease;
+}
+
+.chat-row:hover .avatar {
+    transform: scale(1.05);
+}
+
+.user .avatar {
+    background: linear-gradient(135deg, #1E3A8A, #2563EB);
+    border: 2px solid #3B82F6;
+}
+
+.bot .avatar {
+    background: linear-gradient(135deg, #0F172A, #1E293B);
+    border: 2px solid #334155;
+}
+
+/* 8. MESSAGE BUBBLES */
+.bubble {
+    padding: 16px 24px;
+    border-radius: 20px;
+    max-width: 75%;
+    font-size: 16px;
     line-height: 1.7;
-    letter-spacing: 0.2px;
+    position: relative;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    word-wrap: break-word;
+}
+
+/* USER BUBBLE */
+.user .bubble {
+    background: linear-gradient(135deg, #2563EB 0%, #1D4ED8 100%);
+    color: #FFFFFF;
+    border-bottom-right-radius: 4px; /* iOS style flat corner */
+    border: 1px solid #3B82F6;
+}
+
+/* BOT BUBBLE */
+.bot .bubble {
+    background: #1E293B;
+    color: #E2E8F0;
+    border-bottom-left-radius: 4px; /* iOS style flat corner */
+    border: 1px solid #334155;
+}
+
+/* 9. TYPING ANIMATION (BLINKING CURSOR) */
+@keyframes blink {
+    0%, 100% { opacity: 1; text-shadow: 0 0 8px #38BDF8; }
+    50% { opacity: 0; }
+}
+
+.typing-cursor {
+    display: inline-block;
+    color: #38BDF8;
+    animation: blink 1s step-end infinite;
+    font-weight: 800;
+    margin-left: 2px;
+}
+
+.typing {
     white-space: pre-wrap;
 }
 
-/* Input box */
-.stChatInputContainer {
-    border-top: 1px solid #334155;
+/* 10. OVERRIDE STREAMLIT CHAT INPUT */
+div[data-testid="stChatInput"] {
+    background-color: #0F172A !important;
+    border: 1px solid #334155 !important;
+    border-radius: 16px !important;
+    padding: 2px !important;
+    box-shadow: 0 -10px 40px rgba(11, 17, 32, 0.8) !important;
+}
+div[data-testid="stChatInput"]:focus-within {
+    border-color: #3B82F6 !important;
+    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.3), 0 -10px 40px rgba(11, 17, 32, 0.8) !important;
+}
+div[data-testid="stChatInput"] textarea {
+    color: #F1F5F9 !important;
 }
 
-/* Footer */
-.footer {
+/* 11. SIDEBAR & FOOTER STYLING */
+section[data-testid="stSidebar"] {
+    background-color: #090E17 !important;
+    border-right: 1px solid #1E293B !important;
+}
+.sidebar-box {
+    background: #1E293B;
+    padding: 15px;
+    border-radius: 12px;
+    border: 1px solid #334155;
+    margin-bottom: 20px;
+    font-size: 14px;
+    color: #94A3B8;
+}
+.sidebar-box ul {
+    padding-left: 20px;
+    margin-top: 10px;
+}
+.sidebar-box li {
+    margin-bottom: 8px;
+}
+
+.custom-footer {
     text-align: center;
-    font-size: 12px;
-    color: #94a3b8;
-    margin-top: 40px;
+    color: #475569;
+    font-size: 13px;
+    margin-top: 60px;
+    padding: 20px 0;
+    border-top: 1px solid #1E293B;
+}
+
+/* RESPONSIVE DESIGN */
+@media (max-width: 768px) {
+    .bubble { max-width: 85%; font-size: 15px; padding: 14px 18px; }
+    .custom-header h1 { font-size: 32px; }
+    .avatar { height: 36px; width: 36px; font-size: 18px; margin: 0 10px; }
 }
 </style>
 """, unsafe_allow_html=True)
@@ -84,14 +246,14 @@ body {
 # HEADER
 # -----------------------------
 st.markdown("""
-<h1 style='text-align:center;'>📜 SamvidhanGPT</h1>
-<p style='text-align:center; color:#94a3b8;'>
-Understand the Indian Constitution with AI 🇮🇳
-</p>
+<div class="custom-header">
+    <h1>📜 SamvidhanGPT</h1>
+    <p>Understand the Indian Constitution with cutting-edge AI 🇮🇳</p>
+</div>
 """, unsafe_allow_html=True)
 
 # -----------------------------
-# LOAD DATA
+# LOAD DATA (Cached)
 # -----------------------------
 @st.cache_resource
 def load_resources():
@@ -109,96 +271,112 @@ if "messages" not in st.session_state:
     st.session_state.messages = []
 
 # -----------------------------
-# TYPING EFFECT (SMOOTH)
+# 🔥 PERFECT STREAMING FIX (POLISHED)
 # -----------------------------
-def type_text(text, speed=0.002):
+def stream_response(text):
     placeholder = st.empty()
-    typed = ""
+    output = ""
 
+    # Streaming Loop with Blinking Cursor
     for char in text:
-        typed += char
-        placeholder.markdown(
-            f"<div class='chat-bubble-bot typing'>{typed}▌</div>",
-            unsafe_allow_html=True
-        )
-        time.sleep(speed)
+        output += char
+        placeholder.markdown(f"""
+        <div class="chat-row bot">
+            <div class="avatar">🤖</div>
+            <div class="bubble typing">{output}<span class="typing-cursor">▌</span></div>
+        </div>
+        """, unsafe_allow_html=True)
+        time.sleep(0.003) # Streaming speed
 
-    placeholder.markdown(
-        f"<div class='chat-bubble-bot typing'>{typed}</div>",
-        unsafe_allow_html=True
-    )
+    # Final output without the cursor
+    placeholder.markdown(f"""
+    <div class="chat-row bot">
+        <div class="avatar">🤖</div>
+        <div class="bubble typing">{output}</div>
+    </div>
+    """, unsafe_allow_html=True)
 
 # -----------------------------
-# DISPLAY CHAT
+# DISPLAY CHAT HISTORY
 # -----------------------------
 for msg in st.session_state.messages:
-    if msg["role"] == "user":
-        st.markdown(
-            f"<div class='chat-bubble-user'>👤 {msg['content']}</div>",
-            unsafe_allow_html=True
-        )
-    else:
-        st.markdown(
-            f"<div class='chat-bubble-bot'>🤖 {msg['content']}</div>",
-            unsafe_allow_html=True
-        )
+    role = "user" if msg["role"] == "user" else "bot"
+    avatar = "👤" if role == "user" else "🤖"
+
+    st.markdown(f"""
+    <div class="chat-row {role}">
+        <div class="avatar">{avatar}</div>
+        <div class="bubble">{msg['content']}</div>
+    </div>
+    """, unsafe_allow_html=True)
 
 # -----------------------------
-# INPUT
+# INPUT & LOGIC
 # -----------------------------
 query = st.chat_input("Ask about Articles, Rights, Amendments...")
 
 if query:
-    # Save user message
+    # 1. DISPLAY USER MESSAGE IMMEDIATELY
     st.session_state.messages.append({"role": "user", "content": query})
 
-    # Display user message
-    st.markdown(
-        f"<div class='chat-bubble-user'>👤 {query}</div>",
-        unsafe_allow_html=True
-    )
+    st.markdown(f"""
+    <div class="chat-row user">
+        <div class="avatar">👤</div>
+        <div class="bubble">{query}</div>
+    </div>
+    """, unsafe_allow_html=True)
 
-    # Generate response
-    with st.spinner("📜 Reading Constitution & thinking..."):
+    # 2. GENERATE RESPONSE
+    with st.spinner("📜 Searching the Constitution..."):
         answer = generate_answer(query, index, chunks)
 
-    # Typing effect
-    type_text(answer)
+    # 3. STREAM THE RESPONSE
+    stream_response(answer)
 
-    # Save assistant message
+    # 4. SAVE TO SESSION STATE
     st.session_state.messages.append({"role": "assistant", "content": answer})
 
 # -----------------------------
 # SIDEBAR
 # -----------------------------
 with st.sidebar:
-    st.markdown("## 📘 About")
+    st.markdown("## 📘 SamvidhanGPT")
+    
     st.markdown("""
-    **SamvidhanGPT** is an AI assistant for the Constitution.
+    <div class="sidebar-box">
+        <b>Engine Specifications:</b>
+        <ul>
+            <li>🔹 Vector DB: <b>FAISS</b></li>
+            <li>🔹 Architecture: <b>RAG</b></li>
+            <li>🔹 Speed: <b>Ultra-fast</b></li>
+        </ul>
+        <hr style="border-color: #334155; margin: 15px 0;">
+        👨‍💻 Built by <b>Ganesh Bodakhe</b>
+    </div>
+    """, unsafe_allow_html=True)
 
-    🔹 RAG-based system  
-    🔹 Vector search (FAISS)  
-    🔹 LLM Powered 
-
-    ---
-    👨‍💻 **Author:** Ganesh Bodakhe
-    """)
-
-    st.markdown("## 💡 Try asking")
+    st.markdown("## 💡 Suggested Queries")
     st.markdown("""
-    - What is Article 21?  
-    - Explain Fundamental Rights  
-    - What is DPSP?  
-    """)
+    <div class="sidebar-box" style="background: transparent; border: none; padding: 0;">
+        <ul style="color: #60A5FA; list-style-type: square;">
+            <li>What is Article 21?</li>
+            <li>Explain Fundamental Rights</li>
+            <li>What is DPSP?</li>
+            <li>How is the President elected?</li>
+        </ul>
+    </div>
+    """, unsafe_allow_html=True)
 
-    if st.button("🧹 Clear Chat"):
+    st.write("") # Spacer
+    if st.button("🧹 Clear Chat History", use_container_width=True, type="primary"):
         st.session_state.messages = []
+        st.rerun()
 
 # -----------------------------
 # FOOTER
 # -----------------------------
 st.markdown("""
-<div class="footer">
-Made with ❤️ by Ganesh | SamvidhanGPT
+<div class="custom-footer">
+    SamvidhanGPT • Advanced Legal RAG System • Built by Ganesh 🚀
 </div>
 """, unsafe_allow_html=True)
